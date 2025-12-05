@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>ua.com.poseal</groupId>
 	<artifactId>snshop</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>snshop</name>
 	<description>SNshop project for Spring Boot</description>
 	<url/>
@@ -86,6 +86,73 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<!-- Plugin for managing front-end builds -->
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.15.0</version>
+				<configuration>
+					<nodeVersion>v20.17.0</nodeVersion>
+					<workingDirectory>./client</workingDirectory>
+					<installDirectory>target</installDirectory>
+				</configuration>
+				<executions>
+
+					<!-- 1. Installing Node and NPM -->
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+					</execution>
+
+					<!-- 2. Installing NPM dependencies (npm install) -->
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+
+					<!-- 3. Запуск сборки фронтенда (npm run build) -->
+					<execution>
+						<id>npm run build</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Plugin for copying compiled files to Spring Boot resources -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<!-- The Maven phase in which the copying will be performed -->
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<!-- Copy from the frontend build folder (usually 'build' or 'dist') -->
+							<outputDirectory>src/main/resources/static</outputDirectory>
+							<resources>
+								<resource>
+									<!-- Path to the frontend build folder -->
+									<directory>client/dist</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
