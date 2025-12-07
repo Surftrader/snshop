@@ -10,6 +10,7 @@ import ua.com.poseal.snshop.dto.ProductDto;
 import ua.com.poseal.snshop.model.ProductEntity;
 import ua.com.poseal.snshop.service.ProductService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -36,7 +37,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductEntity> createProduct(
             @RequestPart("product") @Valid ProductDto dto,
-            @RequestPart(value = "file", required = false) MultipartFile file){
+            @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
         ProductEntity createdProduct = productService.saveProduct(dto, file);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }

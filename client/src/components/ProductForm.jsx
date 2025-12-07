@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function ProductForm() {
+  const navigate = useNavigate()
   // State for storing form data
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
-    image: '',
   });
+  const [selectedFile, setSelectedFile] = useState(null);
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -20,29 +22,47 @@ function ProductForm() {
     }));
   };
 
-  // Обработчик отправки формы
+  const handleFileChange = (e) => {
+      setSelectedFile(e.target.files[0]);
+  };
+
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('Sending data...');
     setIsSuccess(false);
 
+    const dataToSend = new FormData();
+
+    const productDtoJson = JSON.stringify({
+        ...formData,
+        price: parseFloat(formData.price)
+    });
+
+    const productBlob = new Blob([productDtoJson], {
+        type: 'application/json'
+    });
+
+    dataToSend.append('product', productBlob);
+
+    if (selectedFile) {
+        dataToSend.append('file', selectedFile, selectedFile.name);
+    }
+
     try {
       // We send a POST request to our backend API
       const response = await fetch('http://localhost:8080/api/products', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        body: dataToSend,
       });
 
       if (response.ok) {
         // If the request is successful (HTTP 201 Created)
-        const result = await response.json();
-        setMessage(`Продукт успешно создан! ID: ${result.id}`);
+        setMessage(`Product successfully created! Redirect...!`);
         setIsSuccess(true);
-        // Clearing the form after successful creation
-        setFormData({ name: '', description: '', price: '', image: '' });
+        setTimeout(() => {
+            navigate('/products');
+            }, 1000);
       } else {
         // If there is a validation error (400 Bad Request) or other error
         const errorData = await response.json();
@@ -72,7 +92,7 @@ function ProductForm() {
       <form onSubmit={handleSubmit}>
         <div>
           <label>
-            Название продукта:*
+            Product name:*
             <input
               type="text"
               name="name"
@@ -85,7 +105,7 @@ function ProductForm() {
         <br />
         <div>
           <label>
-            Описание:
+            Description:
             <textarea
               name="description"
               value={formData.description}
@@ -96,7 +116,7 @@ function ProductForm() {
         <br />
         <div>
           <label>
-            Цена:*
+            Price:*
             <input
               type="number"
               name="price"
@@ -110,14 +130,16 @@ function ProductForm() {
         <br />
         <div>
           <label>
-            URL изображения:
+            Upload image:
             <input
-              type="text"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
+              type="file"
+              name="file"
+              onChange={handleFileChange}
+              accept="image/*"
             />
           </label>
+          {/* Показываем имя выбранного файла */}
+          {selectedFile && <p style={{fontSize: '0.9em', color: '#555'}}>Selected file: **{selectedFile.name}**</p>}
         </div>
         <br />
         <button type="submit">Save product</button>
