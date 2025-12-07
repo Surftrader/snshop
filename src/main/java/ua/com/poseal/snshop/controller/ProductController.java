@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ua.com.poseal.snshop.dto.ProductDto;
 import ua.com.poseal.snshop.model.ProductEntity;
 import ua.com.poseal.snshop.service.ProductService;
@@ -33,8 +34,10 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductEntity> createProduct(@RequestBody @Valid ProductDto dto){
-        ProductEntity createdProduct = productService.saveProduct(dto);
+    public ResponseEntity<ProductEntity> createProduct(
+            @RequestPart("product") @Valid ProductDto dto,
+            @RequestPart(value = "file", required = false) MultipartFile file){
+        ProductEntity createdProduct = productService.saveProduct(dto, file);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 }
