@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
 function ProductListPage() {
   // State for storing the list of products (initially an empty array)
@@ -45,11 +46,14 @@ function ProductListPage() {
   return (
     <div>
       <h2>Product List</h2>
+      <Link to="/products/add">
+          Add product
+        </Link>
       {products.length > 0 ? (
         <ul>
           {products.map(product => (
             <li key={product.id}>
-              {product.name} — ${product.price}
+              {product.name} — {product.price} UAH
             </li>
           ))}
         </ul>
